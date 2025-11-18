@@ -102,7 +102,9 @@ public class ClubDeportivo {
 
         } else {
             //Comprobamos si el socio ya existe en la base de datos
-            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?\"";
+
+            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?";
+
             PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
             pstComprobar.setString(1, socio.getIdSocio());
             pstComprobar.setString(2, socio.getDni());
@@ -122,6 +124,46 @@ public class ClubDeportivo {
                 pst.executeUpdate();
                 return true;
             }
+        }
+    }
+    /**
+     * Inserta una nueva pista en la base de datos
+     *
+     * @param pista Pista a insertar
+     * @return true si se ha insertado correctamente, false en caso contrario
+     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws IdObligatorioException si el objeto Pista o su ID es nulo o está vacío
+     * @author Alejandro
+     */
+    public boolean altaPista(Pista pista) throws SQLException,IdObligatorioException {
+        //Validamos que el objeto pista no sea null
+        if (pista==null){
+            throw new IdObligatorioException("Pista no puede ser null");
+        }else if(pista.getIdPista()==null || pista.getIdPista().isBlank()){
+            throw new IdObligatorioException("ID de la pista es obligatorio");
+        }else{
+            //Comprobamos si pista ya existe
+            String sqlComprobacion="SELECT COUNT(*) FROM pistas WHERE id_pista=?";
+            PreparedStatement pstComprobacion=conexion.prepareStatement(sqlComprobacion);
+            pstComprobacion.setString(1,pista.getIdPista());
+            ResultSet rs=pstComprobacion.executeQuery();
+            rs.next();
+            if(rs.getInt(1)>0){
+                return false;//Si existe devolvemos false
+            }else{
+                //Si no existe insertamos
+                String sql="INSERT INTO pistas(id_pista,deporte,descripcion,disponible) VALUES (?,?,?,?)";
+                PreparedStatement pst=conexion.prepareStatement(sql);
+                pst.setString(1,pista.getIdPista());
+                pst.setString(2,pista.getDeporte());
+                pst.setString(3,pista.getDescripcion());
+                pst.setBoolean(4,pista.isDisponible());
+                pst.executeUpdate();
+                return true;//Si no existe devolvemos true
+
+            }
+
+
         }
     }
 
