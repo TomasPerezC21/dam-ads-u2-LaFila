@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import modelo.*;
 
 public class ClubDeportivo {
-   private Connection conexion;
+    private Connection conexion;
 
     public ClubDeportivo() throws SQLException {
-        conexion= DriverManager.getConnection("jdbc:mysql://localhost:3306/club_dama",
-                                        "root","alumnoDAM");
+        conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/club_dama",
+                "root", "alumnoDAM");
 
     }
 
@@ -27,19 +27,19 @@ public class ClubDeportivo {
      *
      * @param socio socio a insertar
      * @return true si se ha insertado correctamente, false en caso contrario
-     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws SQLException           si hay un error al conectarse con la base de datos
      * @throws IdObligatorioException si el socio es null o su ID no es válido
      * @author Alejandro
      */
-    public boolean altaSocio(Socio socio) throws SQLException,IdObligatorioException {
+    public boolean altaSocio(Socio socio) throws SQLException, IdObligatorioException {
         // Validamos que el socio no sea null
-        if (socio == null){
+        if (socio == null) {
             throw new IdObligatorioException("El socio no puede ser null.");
             //Validamos que el id del socio no sea null
-        } else if (socio.getIdSocio() == null || socio.getIdSocio().isBlank()){
+        } else if (socio.getIdSocio() == null || socio.getIdSocio().isBlank()) {
             throw new IdObligatorioException("El ID del socio es obligatorio.");
 
-        }else  {
+        } else {
             //Comprobamos si el socio ya existe en la base de datos
             String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ?";
             PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
@@ -52,7 +52,7 @@ public class ClubDeportivo {
             if (rs.getInt(1) > 0) {
                 //Como el usuario ya existe, no se puede insertar y por lo tanto devolvemos false
                 return false;
-            }else {
+            } else {
 
 
                 //Creamos la consulta para poder insertar un nuevo socio en la base de datos
@@ -78,6 +78,49 @@ public class ClubDeportivo {
             }
         }
 
+    }
+
+    /**
+     * Elimina un socio de la base de datos
+     *
+     * Comprueba que el socio no sea null y que su ID no sea null
+     *
+     * @param socio socio a eliminar
+     * @return true si se ha eliminado correctamente, false en caso contrario
+     * @throws SQLException           si hay un error al conectarse con la base de datos
+     * @throws IdObligatorioException si el socio es null o su ID no es válido
+     * @author Alejandro
+     */
+    public boolean bajaSocio(Socio socio) throws SQLException, IdObligatorioException {
+        //Validamos que el socio no sea null
+        if (socio == null) {
+            throw new IdObligatorioException("El socio no puede ser null.");
+            //Validamos que el id del socio no sea null
+        } else if (socio.getIdSocio() == null || socio.getIdSocio().isBlank()) {
+            throw new IdObligatorioException("El ID del socio es obligatorio.");
+
+        } else {
+            //Comprobamos si el socio ya existe en la base de datos
+            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ?";
+            PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
+            pstComprobar.setString(1, socio.getIdSocio());
+            pstComprobar.setString(2, socio.getDni());
+
+            ResultSet rs = pstComprobar.executeQuery();
+            rs.next();
+
+            if (rs.getInt(1) == 0) {
+                //Comprobamos que el usuario no existe en la base de datos y si no lo elimina
+                return false;
+            } else {
+                //Eliminamos
+                String sql = "DELETE from socios where id_socios=? ";
+                PreparedStatement pst = conexion.prepareStatement(sql);
+                pst.setString(1, socio.getIdSocio());
+                pst.executeUpdate();
+                return true;
+            }
+        }
     }
 
     public ArrayList<Pista> getPistas() {
