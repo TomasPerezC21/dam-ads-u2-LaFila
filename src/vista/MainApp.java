@@ -26,7 +26,7 @@ public class MainApp extends Application {
             club = new ClubDeportivo();
             showInfo("Conectado");
         } catch (SQLException e) {
-           showError("Error de conexion"+e.getMessage());
+           showError("Error de conexion: "+e.getMessage());
         }
 
 

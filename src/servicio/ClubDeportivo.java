@@ -12,7 +12,9 @@ public class ClubDeportivo {
 
     public ClubDeportivo() throws SQLException {
         conexion= DriverManager.getConnection("jdbc:mysql://localhost:3306/club_dama",
-                                        "root","alumno");
+                                        "root","alumnoDAM");
+
+
     }
 
     public ArrayList<Socio> getSocios() {

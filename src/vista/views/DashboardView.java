@@ -13,6 +13,8 @@ import modelo.Socio;
 import modelo.Reserva;
 import modelo.Pista;
 public class DashboardView extends BorderPane {
+
+
     public DashboardView(ClubDeportivo club) {
         setPadding(new Insets(10));
         Label title = new Label("Resumen");
