@@ -14,7 +14,6 @@ public class ClubDeportivo {
         conexion= DriverManager.getConnection("jdbc:mysql://localhost:3306/club_dama",
                                         "root","alumnoDAM");
 
-
     }
 
     public ArrayList<Socio> getSocios() {
