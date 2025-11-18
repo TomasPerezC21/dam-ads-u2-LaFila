@@ -41,10 +41,11 @@ public class ClubDeportivo {
 
         } else {
             //Comprobamos si el socio ya existe en la base de datos
-            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ?";
+            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?";
             PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
             pstComprobar.setString(1, socio.getIdSocio());
             pstComprobar.setString(2, socio.getDni());
+            pstComprobar.setString(3, socio.getEmail());
 
             ResultSet rs = pstComprobar.executeQuery();
             rs.next();
@@ -56,7 +57,7 @@ public class ClubDeportivo {
 
 
                 //Creamos la consulta para poder insertar un nuevo socio en la base de datos
-                String sql = "INSERT INTO socios(id_socio,dni,nombre,apellido,telefono,email) VALUES (?,?,?,?,?,?)";
+                String sql = "INSERT INTO socios(id_socio,dni,nombre,apellidos,telefono,email) VALUES (?,?,?,?,?,?)";
 
                 PreparedStatement pst = null;
 
@@ -101,10 +102,11 @@ public class ClubDeportivo {
 
         } else {
             //Comprobamos si el socio ya existe en la base de datos
-            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ?";
+            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?\"";
             PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
             pstComprobar.setString(1, socio.getIdSocio());
             pstComprobar.setString(2, socio.getDni());
+            pstComprobar.setString(3, socio.getEmail());
 
             ResultSet rs = pstComprobar.executeQuery();
             rs.next();
