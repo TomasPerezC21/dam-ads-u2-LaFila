@@ -39,7 +39,13 @@ public class ReservaFormView extends GridPane {
 
               Reserva r = new Reserva(id.getText(), idSocio.getValue().getIdSocio(), idPista.getValue().getIdPista(),
                       fecha.getValue(), t, duracion.getValue(), Double.parseDouble(precio.getText()));
-           //     boolean ok = club.crearReserva(r);
+              boolean ok = club.crearReserva(r);
+
+              if (ok) {
+                  showInfo("Reserva realizada correctamente.");
+              }else{
+                  showError("Error al crear Reserva.");
+              }
             } catch (Exception ex) {
                 showError(ex.getMessage());
             }
