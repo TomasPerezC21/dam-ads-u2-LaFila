@@ -15,6 +15,12 @@ public class CambiarDisponibilidadView extends GridPane {
 
         ComboBox<Pista> id = new ComboBox();
         CheckBox disponible = new CheckBox("Disponible");
+
+        //combobox
+        if (club.getPistas() != null) {
+            id.getItems().addAll(club.getPistas());
+        }
+
         Button cambiar = new Button("Aplicar");
 
         addRow(0, new Label("idPista"), id);

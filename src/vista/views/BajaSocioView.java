@@ -17,17 +17,16 @@ public class BajaSocioView extends GridPane {
         ComboBox<Socio> id = new ComboBox<>();
         Button baja = new Button("Dar de baja");
 
+        if (club.getSocios() != null) {
+            id.getItems().addAll(club.getSocios());
+        }
+
         addRow(0, new Label("Socio"), id);
         add(baja, 1, 1);
 
         baja.setOnAction(e -> {
 
             Socio socioSeleccionado = id.getValue();
-
-            if (socioSeleccionado == null) {
-                showError("Debes seleccionar un socio de la lista.");
-                return;
-            }
 
             try{
                 club.bajaSocio(socioSeleccionado);
@@ -54,4 +53,5 @@ public class BajaSocioView extends GridPane {
         a.setHeaderText(null);
         a.showAndWait();
     }
+
 }

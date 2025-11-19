@@ -90,7 +90,7 @@ public class ClubDeportivo {
     public boolean bajaSocio(Socio socio) throws SQLException, IdObligatorioException {
         //Validamos que el socio no sea null
         if (socio == null) {
-            throw new IdObligatorioException("El socio no puede ser null.");
+            throw new IdObligatorioException("El socio no puede ser nulo.");
             //Validamos que el id del socio no sea null
         } else if (socio.getIdSocio() == null || socio.getIdSocio().isBlank()) {
             throw new IdObligatorioException("El ID del socio es obligatorio.");
@@ -264,11 +264,61 @@ public class ClubDeportivo {
 
     public ArrayList<Pista> getPistas() {
         ArrayList<Pista> pistas = new ArrayList<>();
+        String sql = "SELECT * FROM pistas";
+
+        try (Statement st = conexion.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+
+                Pista p = new Pista(
+                        rs.getString("id_pista"),
+                        rs.getString("deporte"),
+                        rs.getString("descripcion"),
+                        rs.getBoolean("disponible") // Esto convierte automáticamente 1/0 a true/false
+                );
+                pistas.add(p);
+            }
+
+        } catch (SQLException | IdObligatorioException e) {
+            System.err.println("Error cargando pistas: " + e.getMessage());
+            e.printStackTrace();
+        }
         return pistas;
     }
 
     public ArrayList<Reserva> getReservas() {
         ArrayList<Reserva> reservas = new ArrayList<>();
+        String sql = "SELECT * FROM reservas";
+
+        try (Statement st = conexion.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                // Conversión de fechas y horas de SQL a Java
+                java.time.LocalDate fecha = rs.getDate("fecha").toLocalDate();
+                java.time.LocalTime hora = rs.getTime("hora_inicio").toLocalTime();
+
+                // IMPORTANTE: Revisa el orden de tu constructor de Reserva
+                Reserva r = new Reserva(
+                        rs.getString("id_reserva"),
+                        rs.getString("id_socio"),
+                        rs.getString("id_pista"),
+                        fecha,
+                        hora,
+                        rs.getInt("duracion_min"),
+                        rs.getDouble("precio")
+                );
+                reservas.add(r);
+            }
+
+        } catch (SQLException e) { // Si Reserva no lanza IdObligatorioException, quita eso del catch
+            System.err.println("Error cargando reservas: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            // Captura genérica por si acaso falla el constructor
+            e.printStackTrace();
+        }
         return reservas;
     }
 
@@ -280,7 +330,7 @@ public class ClubDeportivo {
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                // Asegúrate de que el orden coincide con tu constructor de Socio
+
                 Socio s = new Socio(
                         rs.getString("id_socio"),
                         rs.getString("dni"),

@@ -13,6 +13,11 @@ public class CancelarReservaView extends GridPane {
         setHgap(8); setVgap(8);
 
         ComboBox<Reserva> id = new ComboBox();
+
+        if (club.getReservas() != null) {
+            id.getItems().addAll(club.getReservas());
+        }
+
         Button cancelar = new Button("Cancelar reserva");
 
         addRow(0, new Label("Reserva"), id);

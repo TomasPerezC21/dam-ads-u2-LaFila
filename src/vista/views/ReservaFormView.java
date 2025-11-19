@@ -17,7 +17,17 @@ public class ReservaFormView extends GridPane {
 
         TextField id = new TextField();
         ComboBox<Socio> idSocio = new ComboBox();
+
+        if (club.getSocios() != null) {
+            idSocio.getItems().addAll(club.getSocios());
+        }
+
         ComboBox<Pista> idPista = new ComboBox();
+
+        if (club.getPistas() != null) {
+            idPista.getItems().addAll(club.getPistas());
+        }
+
         DatePicker fecha = new DatePicker(LocalDate.now());
         TextField hora = new TextField("10:00");
         Spinner<Integer> duracion = new Spinner<>(30, 300, 60, 30);
