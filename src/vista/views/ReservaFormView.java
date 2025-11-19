@@ -35,19 +35,49 @@ public class ReservaFormView extends GridPane {
 
         crear.setOnAction(e -> {
             try {
+                // 1. Validaciones de seguridad para evitar el NullPointerException
+                if (idSocio.getValue() == null || idPista.getValue() == null || fecha.getValue() == null) {
+                    showError("Faltan datos: Debes seleccionar Socio, Pista y Fecha.");
+                    return;
+                }
+
+                // 2. Parseo de la hora (Si el formato está mal, saltará al catch)
                 LocalTime t = LocalTime.parse(hora.getText());
 
-              Reserva r = new Reserva(id.getText(), idSocio.getValue().getIdSocio(), idPista.getValue().getIdPista(),
-                      fecha.getValue(), t, duracion.getValue(), Double.parseDouble(precio.getText()));
-              boolean ok = club.crearReserva(r);
+                // 3. Crear la reserva
+                Reserva r = new Reserva(
+                        id.getText(),
+                        idSocio.getValue().getIdSocio(),
+                        idPista.getValue().getIdPista(),
+                        fecha.getValue(),
+                        t,
+                        duracion.getValue(),
+                        Double.parseDouble(precio.getText())
+                );
 
-              if (ok) {
-                  showInfo("Reserva realizada correctamente.");
-              }else{
-                  showError("Error al crear Reserva.");
-              }
+                boolean ok = club.crearReserva(r);
+
+                if (ok) {
+                    showInfo("Reserva realizada correctamente.");
+
+                    // 4. Limpiar campos
+                    id.clear();
+                    idSocio.setValue(null);
+                    idPista.setValue(null);
+                    fecha.setValue(null);
+                    hora.clear();
+                    precio.clear();
+
+                } else {
+                    showError("Error al crear Reserva (quizás ID repetido o pista ocupada).");
+                }
+
+            } catch (java.time.format.DateTimeParseException dtpe) {
+                showError("El formato de la hora debe ser HH:mm (ej: 14:30)");
+            } catch (NumberFormatException nfe) {
+                showError("El precio debe ser un número válido.");
             } catch (Exception ex) {
-                showError(ex.getMessage());
+                showError("Error inesperado: " + ex.getMessage());
             }
         });
     }
