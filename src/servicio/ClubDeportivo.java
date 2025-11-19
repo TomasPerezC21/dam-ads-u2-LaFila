@@ -9,14 +9,9 @@ public class ClubDeportivo {
     private Connection conexion;
 
     public ClubDeportivo() throws SQLException {
-        conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/club_dama",
-                "root", "alumnoDAM");
+        conexion = DriverManager.getConnection("jdbc:mysql://PMYSQL190.dns-servicio.com:3306/11158164_ClubDama2",
+                "roots", "alumnoDAM-1");
 
-    }
-
-    public ArrayList<Socio> getSocios() {
-        ArrayList<Socio> socios = new ArrayList<>();
-        return socios;
     }
 
     /**
@@ -275,5 +270,30 @@ public class ClubDeportivo {
     public ArrayList<Reserva> getReservas() {
         ArrayList<Reserva> reservas = new ArrayList<>();
         return reservas;
+    }
+
+    public ArrayList<Socio> getSocios() {
+        ArrayList<Socio> socios = new ArrayList<>();
+        String sql = "SELECT * FROM socios";
+
+        try (Statement st = conexion.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                // Asegúrate de que el orden coincide con tu constructor de Socio
+                Socio s = new Socio(
+                        rs.getString("id_socio"),
+                        rs.getString("dni"),
+                        rs.getString("nombre"),
+                        rs.getString("apellidos"),
+                        rs.getString("telefono"),
+                        rs.getString("email")
+                );
+                socios.add(s);
+            }
+        } catch (SQLException | IdObligatorioException e) {
+            e.printStackTrace();
+        }
+        return socios;
     }
 }
