@@ -266,6 +266,7 @@ public class ClubDeportivo {
             return filas > 0;
         }
     }
+
     public ArrayList<Pista> getPistas() {
         ArrayList<Pista> pistas = new ArrayList<>();
         return pistas;
