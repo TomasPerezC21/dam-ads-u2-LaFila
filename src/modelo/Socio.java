@@ -65,4 +65,10 @@ public class Socio {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
+    @Override
+    public String toString() {
+        return idSocio + " - " + nombre; // Esto es lo que se verá en el desplegable
+    }
 }

@@ -43,4 +43,8 @@ public class Pista {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+
+    public String toString(){
+        return String.valueOf(this.idPista);
+    }
 }
