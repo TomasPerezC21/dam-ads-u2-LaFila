@@ -246,6 +246,26 @@ public class ClubDeportivo {
             return true;
         }
     }
+
+
+    /**
+     * Cancela una reserva existente en la base de datos.
+     *
+     * @param idReserva ID de la reserva a eliminar
+     * @return true si se eliminó correctamente, false si la reserva no existe
+     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws IdObligatorioException si el idReserva es null o vacío
+     * @author Llorente
+     */
+
+    public boolean cancelarReserva(String idReserva) throws SQLException {
+        String sql = "DELETE FROM reservas WHERE id_reserva=?";
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setString(1, idReserva);
+            int filas = pst.executeUpdate();
+            return filas > 0;
+        }
+    }
     public ArrayList<Pista> getPistas() {
         ArrayList<Pista> pistas = new ArrayList<>();
         return pistas;
