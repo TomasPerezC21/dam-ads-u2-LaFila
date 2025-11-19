@@ -33,10 +33,9 @@ public class CambiarDisponibilidadView extends GridPane {
                 }
 
                 // 3. Sacar el ID (String) del objeto Pista
-
                 String idString = pistaSeleccionada.getIdPista();
 
-                // 4. Llamar al método usando ese String
+                // 4. Llamar al metodo usando ese String
                 boolean exito = club.cambiarDisponibilidadPista(idString, disponible.isSelected());
 
                 if (exito) {
