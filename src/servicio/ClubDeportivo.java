@@ -16,7 +16,7 @@ public class ClubDeportivo {
 
     /**
      * Inserta un nuevo socio en la base de datos
-     *
+     * <p>
      * Compueba primero que el socio no sea null , que tenga ID
      * y que no exista ya en la base de datos
      *
@@ -78,7 +78,7 @@ public class ClubDeportivo {
 
     /**
      * Elimina un socio de la base de datos
-     *
+     * <p>
      * Comprueba que el socio no sea null y que su ID no sea null
      *
      * @param socio socio a eliminar
@@ -121,38 +121,39 @@ public class ClubDeportivo {
             }
         }
     }
+
     /**
      * Inserta una nueva pista en la base de datos
      *
      * @param pista Pista a insertar
      * @return true si se ha insertado correctamente, false en caso contrario
-     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws SQLException           si hay un error al conectarse con la base de datos
      * @throws IdObligatorioException si el objeto Pista o su ID es nulo o está vacío
      * @author Alejandro
      */
-    public boolean altaPista(Pista pista) throws SQLException,IdObligatorioException {
+    public boolean altaPista(Pista pista) throws SQLException, IdObligatorioException {
         //Validamos que el objeto pista no sea null
-        if (pista==null){
+        if (pista == null) {
             throw new IdObligatorioException("Pista no puede ser null");
-        }else if(pista.getIdPista()==null || pista.getIdPista().isBlank()){
+        } else if (pista.getIdPista() == null || pista.getIdPista().isBlank()) {
             throw new IdObligatorioException("ID de la pista es obligatorio");
-        }else{
+        } else {
             //Comprobamos si pista ya existe
-            String sqlComprobacion="SELECT COUNT(*) FROM pistas WHERE id_pista=?";
-            PreparedStatement pstComprobacion=conexion.prepareStatement(sqlComprobacion);
-            pstComprobacion.setString(1,pista.getIdPista());
-            ResultSet rs=pstComprobacion.executeQuery();
+            String sqlComprobacion = "SELECT COUNT(*) FROM pistas WHERE id_pista=?";
+            PreparedStatement pstComprobacion = conexion.prepareStatement(sqlComprobacion);
+            pstComprobacion.setString(1, pista.getIdPista());
+            ResultSet rs = pstComprobacion.executeQuery();
             rs.next();
-            if(rs.getInt(1)>0){
+            if (rs.getInt(1) > 0) {
                 return false;//Si existe devolvemos false
-            }else{
+            } else {
                 //Si no existe insertamos
-                String sql="INSERT INTO pistas(id_pista,deporte,descripcion,disponible) VALUES (?,?,?,?)";
-                PreparedStatement pst=conexion.prepareStatement(sql);
-                pst.setString(1,pista.getIdPista());
-                pst.setString(2,pista.getDeporte());
-                pst.setString(3,pista.getDescripcion());
-                pst.setBoolean(4,pista.isDisponible());
+                String sql = "INSERT INTO pistas(id_pista,deporte,descripcion,disponible) VALUES (?,?,?,?)";
+                PreparedStatement pst = conexion.prepareStatement(sql);
+                pst.setString(1, pista.getIdPista());
+                pst.setString(2, pista.getDeporte());
+                pst.setString(3, pista.getDescripcion());
+                pst.setBoolean(4, pista.isDisponible());
                 pst.executeUpdate();
                 return true;//Si no existe devolvemos true
 
@@ -165,10 +166,10 @@ public class ClubDeportivo {
     /**
      * Cambia la disponibilidad de una pista.
      *
-     * @param idPista ID de la pista a modificar
+     * @param idPista    ID de la pista a modificar
      * @param disponible nuevo estado de disponibilidad
      * @return true si se actualizó correctamente, false si la pista no existe
-     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws SQLException           si hay un error al conectarse con la base de datos
      * @throws IdObligatorioException si el idPista es null o vacío
      * @author Llorente
      */
@@ -184,15 +185,14 @@ public class ClubDeportivo {
     }
 
 
-
     /**
      * Crea una nueva reserva en la base de datos.
-     *
+     * <p>
      * Comprueba que la pista esté disponible, que no existan solapes y que todos los campos sean válidos.
      *
      * @param reserva Objeto Reserva a insertar
      * @return true si se ha insertado correctamente, false si hay conflicto o la reserva ya existe
-     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws SQLException           si hay un error al conectarse con la base de datos
      * @throws IdObligatorioException si alguno de los campos de la reserva es null o inválido
      * @author Llorente
      */
@@ -248,7 +248,7 @@ public class ClubDeportivo {
      *
      * @param idReserva ID de la reserva a eliminar
      * @return true si se eliminó correctamente, false si la reserva no existe
-     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws SQLException           si hay un error al conectarse con la base de datos
      * @throws IdObligatorioException si el idReserva es null o vacío
      * @author Llorente
      */
@@ -262,6 +262,16 @@ public class ClubDeportivo {
         }
     }
 
+    /**
+     * Recupera una lista de todas las pistas deportivas almacenadas en la base de datos.
+     * <p>
+     * La operación consulta la tabla "pistas" y mapea cada registro
+     * a un objeto {@code Pista}.
+     *
+     * @return una lista de objetos {@code Pista} que representan las pistas del club.
+     * Devuelve una lista vacía si no se encuentran pistas o si ocurre un error.
+     *
+     */
     public ArrayList<Pista> getPistas() {
         ArrayList<Pista> pistas = new ArrayList<>();
         String sql = "SELECT * FROM pistas";
@@ -287,6 +297,17 @@ public class ClubDeportivo {
         return pistas;
     }
 
+    /**
+     * Recupera una lista de todas las reservas existentes en la base de datos.
+     * <p>
+     * La operación consulta la tabla "reservas" y transforma los registros
+     * de la base de datos en objetos {@code Reserva}, realizando las conversiones
+     * necesarias de tipos SQL (Date, Time) a tipos de Java (LocalDate, LocalTime).
+     *
+     * @return una lista de objetos {@code Reserva} que contienen todas las reservas.
+     * Devuelve una lista vacía si no hay reservas o si ocurre un error en la carga.
+     *
+     */
     public ArrayList<Reserva> getReservas() {
         ArrayList<Reserva> reservas = new ArrayList<>();
         String sql = "SELECT * FROM reservas";
@@ -322,6 +343,18 @@ public class ClubDeportivo {
         return reservas;
     }
 
+    /**
+     * Recupera una lista de todos los socios registrados en la base de datos.
+     * <p>
+     * La operación consulta la tabla "socios" y mapea cada registro
+     * a un objeto {@code Socio}.
+     *
+     * @return una lista de objetos {@code Socio} que representan a todos los miembros del club.
+     * Devuelve una lista vacía si no se encuentran socios o si ocurre un error en la carga.
+     * @throws SQLException           si ocurre un error al acceder a la base de datos.
+     * @throws IdObligatorioException si el constructor de {@code Socio} falla por datos nulos o inválidos.
+     *
+     */
     public ArrayList<Socio> getSocios() {
         ArrayList<Socio> socios = new ArrayList<>();
         String sql = "SELECT * FROM socios";
