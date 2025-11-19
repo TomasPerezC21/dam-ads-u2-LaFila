@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import java.util.function.Consumer;
 
 public class BajaSocioView extends GridPane {
+
     public BajaSocioView(ClubDeportivo club) {
         setPadding(new Insets(12));
         setHgap(8); setVgap(8);
@@ -21,6 +22,22 @@ public class BajaSocioView extends GridPane {
 
         baja.setOnAction(e -> {
         //LLamar al método del modelo para dar de baja  a un socio.
+
+            Socio socioSeleccionado = id.getValue();
+
+            if (socioSeleccionado == null) {
+                showError("Debes seleccionar un socio de la lista.");
+                return;
+            }
+
+            try{
+
+
+
+            }catch(Exception ex){
+                showError("Error al dar de baja: " + ex.getMessage());
+            }
+
         });
     }
 
