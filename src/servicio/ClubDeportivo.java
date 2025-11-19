@@ -118,7 +118,7 @@ public class ClubDeportivo {
                 return false;
             } else {
                 //Eliminamos
-                String sql = "DELETE from socios where id_socios=? ";
+                String sql = "DELETE from socios where id_socio=? ";
                 PreparedStatement pst = conexion.prepareStatement(sql);
                 pst.setString(1, socio.getIdSocio());
                 pst.executeUpdate();
@@ -164,6 +164,27 @@ public class ClubDeportivo {
             }
 
 
+        }
+    }
+
+    /**
+     * Cambia la disponibilidad de una pista.
+     *
+     * @param idPista ID de la pista a modificar
+     * @param disponible nuevo estado de disponibilidad
+     * @return true si se actualizó correctamente, false si la pista no existe
+     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws IdObligatorioException si el idPista es null o vacío
+     * @author Llorente
+     */
+
+    public boolean cambiarDisponibilidadPista(String idPista, boolean disponible) throws SQLException {
+        String sql = "UPDATE pistas SET disponible=? WHERE id_pista=?";
+        try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+            pst.setBoolean(1, disponible);
+            pst.setString(2, idPista);
+            int filas = pst.executeUpdate();
+            return filas > 0;
         }
     }
 
