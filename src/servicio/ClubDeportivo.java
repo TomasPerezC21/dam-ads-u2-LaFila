@@ -188,6 +188,64 @@ public class ClubDeportivo {
         }
     }
 
+
+
+    /**
+     * Crea una nueva reserva en la base de datos.
+     *
+     * Comprueba que la pista esté disponible, que no existan solapes y que todos los campos sean válidos.
+     *
+     * @param reserva Objeto Reserva a insertar
+     * @return true si se ha insertado correctamente, false si hay conflicto o la reserva ya existe
+     * @throws SQLException si hay un error al conectarse con la base de datos
+     * @throws IdObligatorioException si alguno de los campos de la reserva es null o inválido
+     * @author Llorente
+     */
+
+    public boolean crearReserva(Reserva reserva) throws SQLException, IdObligatorioException {
+        if (reserva == null) throw new IdObligatorioException("Reserva no puede ser null");
+        if (reserva.getIdReserva() == null || reserva.getIdReserva().isBlank())
+            throw new IdObligatorioException("ID de la reserva obligatorio");
+
+        // Comprobar que la pista está disponible
+        String sqlPista = "SELECT disponible FROM pistas WHERE id_pista=?";
+        try (PreparedStatement pst = conexion.prepareStatement(sqlPista)) {
+            pst.setString(1, reserva.getIdPista());
+            try (ResultSet rs = pst.executeQuery()) {
+                if (!rs.next()) throw new IdObligatorioException("Pista inexistente");
+                if (!rs.getBoolean(1)) return false; // Pista no disponible
+            }
+        }
+
+        // Comprobar solape de reservas en la misma fecha
+        String sqlSolape = "SELECT COUNT(*) FROM reservas WHERE id_pista=? AND fecha=? AND " +
+                "(? < ADDTIME(hora_inicio, SEC_TO_TIME(duracion_min*60)) AND ADDTIME(?, SEC_TO_TIME(?*60)) > hora_inicio)";
+        try (PreparedStatement pst = conexion.prepareStatement(sqlSolape)) {
+            pst.setString(1, reserva.getIdPista());
+            pst.setDate(2, Date.valueOf(reserva.getFecha()));
+            pst.setTime(3, Time.valueOf(reserva.getHoraInicio()));
+            pst.setTime(4, Time.valueOf(reserva.getHoraInicio()));
+            pst.setInt(5, reserva.getDuracionMin());
+            try (ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) > 0) return false; // Solape
+            }
+        }
+
+        // Insertar reserva
+        String sqlInsert = "INSERT INTO reservas(id_reserva,id_socio,id_pista,fecha,hora_inicio,duracion_min,precio) VALUES (?,?,?,?,?,?,?)";
+        try (PreparedStatement pst = conexion.prepareStatement(sqlInsert)) {
+            pst.setString(1, reserva.getIdReserva());
+            pst.setString(2, reserva.getIdSocio());
+            pst.setString(3, reserva.getIdPista());
+            pst.setDate(4, Date.valueOf(reserva.getFecha()));
+            pst.setTime(5, Time.valueOf(reserva.getHoraInicio()));
+            pst.setInt(6, reserva.getDuracionMin());
+            pst.setDouble(7, reserva.getPrecio());
+            pst.executeUpdate();
+            return true;
+        }
+    }
     public ArrayList<Pista> getPistas() {
         ArrayList<Pista> pistas = new ArrayList<>();
         return pistas;
