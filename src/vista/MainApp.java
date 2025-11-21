@@ -120,9 +120,14 @@ public class MainApp extends Application {
             }
         });
         MenuItem salir = new MenuItem("Salir");
+        /**
+         * metodo para salir de la app, llama a un metodo de la clase
+         * servicio que cierra la conexión con el servidor de la base de datos
+         *
+         */
         salir.setOnAction(e -> {
             try {
-                //Lammo al método del modelo para guardar antes de salir
+                club.cerrarConexion();
             } catch (Exception ignored) {
             }
             Platform.exit();

@@ -379,4 +379,18 @@ public class ClubDeportivo {
         }
         return socios;
     }
+
+    /**
+     * Metodo que sirve para cerrar conexión con la base de datos.
+     */
+    public void cerrarConexion() {
+        try {
+            if (conexion != null && !conexion.isClosed()) {
+                conexion.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
