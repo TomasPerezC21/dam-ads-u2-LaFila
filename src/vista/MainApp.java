@@ -110,29 +110,34 @@ public class MainApp extends Application {
 
         // ---- ARCHIVO ----
         Menu archivo = new Menu("Archivo");
-        MenuItem guardar = new MenuItem("Guardar");
-        guardar.setOnAction(e -> {
-            try {
-                //    LLamo al método del modelo para guardar los datos en fichero
-
-            } catch (Exception ex) {
-                showError("Error guardando: " + ex.getMessage());
-            }
-        });
+//        MenuItem guardar = new MenuItem("Guardar");
+//        guardar.setOnAction(e -> {
+//            try {
+//                //    LLamo al método del modelo para guardar los datos en fichero
+//
+//            } catch (Exception ex) {
+//                showError("Error guardando: " + ex.getMessage());
+//            }
+//        });
         MenuItem salir = new MenuItem("Salir");
         /**
          * metodo para salir de la app, llama a un metodo de la clase
          * servicio que cierra la conexión con el servidor de la base de datos
-         *
+         * @author Álvaro Guy
          */
         salir.setOnAction(e -> {
             try {
+                showInfo("Hasta la próxima.");
                 club.cerrarConexion();
+
             } catch (Exception ignored) {
             }
             Platform.exit();
         });
-        archivo.getItems().addAll(guardar, new SeparatorMenuItem(), salir);
+        archivo.getItems().addAll(
+                //guardar,
+                //new SeparatorMenuItem(),
+                salir);
 
         mb.getMenus().addAll(archivo, socios, pistas, reservas, ver);
         return mb;

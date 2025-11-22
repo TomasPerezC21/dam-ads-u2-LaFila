@@ -27,7 +27,7 @@ public class CambiarDisponibilidadView extends GridPane {
             }
         });
 
-        //combobox
+
         if (club.getPistas() != null) {
             id.getItems().addAll(club.getPistas());
         }
