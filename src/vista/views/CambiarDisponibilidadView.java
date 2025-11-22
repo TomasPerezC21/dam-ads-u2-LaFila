@@ -16,6 +16,17 @@ public class CambiarDisponibilidadView extends GridPane {
         ComboBox<Pista> id = new ComboBox();
         CheckBox disponible = new CheckBox("Disponible");
 
+        //El estado del combobox se actualiza con la disponibilidad de la pista en ese momento
+        id.setOnAction(e -> {
+            Pista pistaSeleccionada = id.getValue();
+
+            // Verificamos que no sea null para evitar errores
+            if (pistaSeleccionada != null) {
+                // Ponemos el checkbox igual que el estado real de la pista
+                disponible.setSelected(pistaSeleccionada.isDisponible());
+            }
+        });
+
         //combobox
         if (club.getPistas() != null) {
             id.getItems().addAll(club.getPistas());
