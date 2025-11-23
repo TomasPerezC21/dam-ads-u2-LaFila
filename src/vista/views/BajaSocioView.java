@@ -25,21 +25,35 @@ public class BajaSocioView extends GridPane {
         add(baja, 1, 1);
 
         baja.setOnAction(e -> {
-
             Socio socioSeleccionado = id.getValue();
 
-            try{
-                club.bajaSocio(socioSeleccionado);
-                showInfo("Socio dado de baja con exito");
-
-                //Actualizar la vista
-                id.getItems().remove(socioSeleccionado);
-                id.setValue(null);
-
-            }catch(Exception ex){
-                showError("Error al dar de baja: " + ex.getMessage());
+            // 1. Evitar NullPointerException si el usuario no selecciona nada
+            if (socioSeleccionado == null) {
+                showError("Por favor, selecciona un socio de la lista.");
+                return;
             }
 
+            try {
+
+                boolean exito = club.bajaSocio(socioSeleccionado);
+
+                if (exito) {
+                    // Si devuelve TRUE: Se borró correctamente
+                    showInfo("Socio dado de baja con éxito");
+
+                    // Actualizar la vista
+                    id.getItems().remove(socioSeleccionado);
+                    id.setValue(null);
+
+                } else {
+                    // Si devuelve FALSE: No se pudo borrar (Regla de negocio activada)
+                    showError("No se pudo dar de baja. Posiblemente tenga reservas pendientes o ya no exista.");
+                }
+
+            } catch (Exception ex) {
+                // Excepciones técnicas (Base de datos caída, etc.)
+                showError("Error técnico al dar de baja: " + ex.getMessage());
+            }
         });
     }
 
