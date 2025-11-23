@@ -51,6 +51,12 @@ public class ReservaFormView extends GridPane {
                     return;
                 }
 
+                // Regla de Negocio: No se puede reservar en el pasado
+                if (fecha.getValue().isBefore(LocalDate.now())) {
+                    showError("No se puede reservar en una fecha pasada.");
+                    return;
+                }
+
                 // 2. Parseo de la hora (Si el formato está mal, saltará al catch)
                 LocalTime t = LocalTime.parse(hora.getText());
 
