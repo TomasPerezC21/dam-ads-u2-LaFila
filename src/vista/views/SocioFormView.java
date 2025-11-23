@@ -45,7 +45,7 @@ public class SocioFormView extends GridPane {
                    email.clear();
                }
                else {
-                   showError("El socio no se pudo insertar. Revise que el ID no sea repetido.");
+                   showError("El socio no se pudo insertar. Revise que los campos ID, Email o DNI no sean repetidos.");
                }
             } catch (Exception ex) {
                 showError(ex.getMessage());
