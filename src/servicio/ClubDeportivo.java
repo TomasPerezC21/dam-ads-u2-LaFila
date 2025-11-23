@@ -96,28 +96,42 @@ public class ClubDeportivo {
             throw new IdObligatorioException("El ID del socio es obligatorio.");
 
         } else {
-            //Comprobamos si el socio ya existe en la base de datos
-
-            String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?";
-
-            PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
-            pstComprobar.setString(1, socio.getIdSocio());
-            pstComprobar.setString(2, socio.getDni());
-            pstComprobar.setString(3, socio.getEmail());
-
-            ResultSet rs = pstComprobar.executeQuery();
-            rs.next();
-
-            if (rs.getInt(1) == 0) {
-                //Comprobamos que el usuario no existe en la base de datos y si no lo elimina
+            //Comprobamos reservas futuras
+            String sqlReservas = "SELECT COUNT(*) FROM reservas WHERE id_socio=? AND fecha >= ?";
+            PreparedStatement pstReservas = conexion.prepareStatement(sqlReservas);
+            pstReservas.setString(1, socio.getIdSocio());
+            pstReservas.setDate(2, new java.sql.Date(System.currentTimeMillis()));
+            ResultSet rsReservas = pstReservas.executeQuery();
+            rsReservas.next();
+            if (rsReservas.getInt(1) > 0) {
+                //Tiene reservas pendientes, No se puede borrar
                 return false;
             } else {
-                //Eliminamos
-                String sql = "DELETE from socios where id_socio=? ";
-                PreparedStatement pst = conexion.prepareStatement(sql);
-                pst.setString(1, socio.getIdSocio());
-                pst.executeUpdate();
-                return true;
+
+
+                //Comprobamos si el socio ya existe en la base de datos
+
+                String sqlComprobar = "SELECT COUNT(*) FROM socios WHERE id_socio = ? OR dni = ? OR email = ?";
+
+                PreparedStatement pstComprobar = conexion.prepareStatement(sqlComprobar);
+                pstComprobar.setString(1, socio.getIdSocio());
+                pstComprobar.setString(2, socio.getDni());
+                pstComprobar.setString(3, socio.getEmail());
+
+                ResultSet rs = pstComprobar.executeQuery();
+                rs.next();
+
+                if (rs.getInt(1) == 0) {
+                    //Comprobamos que el usuario no existe en la base de datos y si no lo elimina
+                    return false;
+                } else {
+                    //Eliminamos
+                    String sql = "DELETE from socios where id_socio=? ";
+                    PreparedStatement pst = conexion.prepareStatement(sql);
+                    pst.setString(1, socio.getIdSocio());
+                    pst.executeUpdate();
+                    return true;
+                }
             }
         }
     }
