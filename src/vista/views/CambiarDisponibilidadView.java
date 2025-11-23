@@ -57,8 +57,9 @@ public class CambiarDisponibilidadView extends GridPane {
 
                 if (exito) {
                     showInfo("Disponibilidad actualizada correctamente.");
-                } else {
-                    showError("No se pudo actualizar la pista.");
+
+                    // Actualizamos el objeto en memoria para que coincida con la BBDD
+                    pistaSeleccionada.setDisponible(disponible.isSelected());
                 }
 
             } catch (Exception ex) {
