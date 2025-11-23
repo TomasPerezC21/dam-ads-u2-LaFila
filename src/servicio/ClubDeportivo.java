@@ -200,59 +200,56 @@ public class ClubDeportivo {
 
 
     /**
-     * Crea una nueva reserva en la base de datos.
+     * Crea una nueva reserva utilizando el PROCEDIMIENTO ALMACENADO.
      * <p>
-     * Comprueba que la pista esté disponible, que no existan solapes y que todos los campos sean válidos.
+     * REGLAS:
+     * 1. Se validan los campos obligatorios en Java (ID, nulls).
+     * 2. La validación de disponibilidad, solapes y el cálculo del precio (usando la función)
+     * se delegan al script SQL `sp_crear_reserva`.
      *
      * @param reserva Objeto Reserva a insertar
-     * @return true si se ha insertado correctamente, false si hay conflicto o la reserva ya existe
-     * @throws SQLException           si hay un error al conectarse con la base de datos
-     * @throws IdObligatorioException si alguno de los campos de la reserva es null o inválido
-     * @author Llorente
+     * @return true si se ha insertado correctamente, false si hay conflicto lógico (capturado del SP)
+     * @throws SQLException           si hay un error de conexión o error SQL no controlado
+     * @throws IdObligatorioException si campos obligatorios son nulos
      */
-
     public boolean crearReserva(Reserva reserva) throws SQLException, IdObligatorioException {
+        // 1. Validaciones básicas en Java (Input validation)
         if (reserva == null) throw new IdObligatorioException("Reserva no puede ser null");
         if (reserva.getIdReserva() == null || reserva.getIdReserva().isBlank())
             throw new IdObligatorioException("ID de la reserva obligatorio");
+        if (reserva.getIdSocio() == null || reserva.getIdPista() == null)
+            throw new IdObligatorioException("ID de socio y pista obligatorios");
 
-        // Comprobar que la pista está disponible
-        String sqlPista = "SELECT disponible FROM pistas WHERE id_pista=?";
-        try (PreparedStatement pst = conexion.prepareStatement(sqlPista)) {
-            pst.setString(1, reserva.getIdPista());
-            try (ResultSet rs = pst.executeQuery()) {
-                if (!rs.next()) throw new IdObligatorioException("Pista inexistente");
-                if (!rs.getBoolean(1)) return false; // Pista no disponible
-            }
-        }
+        // 2. Llamada al Procedimiento Almacenado
+        // El SP valida pista operativa, valida solapes y CALCULA el precio usando fn_precio_reserva
+        String sql = "{call sp_crear_reserva(?, ?, ?, ?, ?, ?)}";
 
-        // Comprobar solape de reservas en la misma fecha
-        String sqlSolape = "SELECT COUNT(*) FROM reservas WHERE id_pista=? AND fecha=? AND " +
-                "(? < ADDTIME(hora_inicio, SEC_TO_TIME(duracion_min*60)) AND ADDTIME(?, SEC_TO_TIME(?*60)) > hora_inicio)";
-        try (PreparedStatement pst = conexion.prepareStatement(sqlSolape)) {
-            pst.setString(1, reserva.getIdPista());
-            pst.setDate(2, Date.valueOf(reserva.getFecha()));
-            pst.setTime(3, Time.valueOf(reserva.getHoraInicio()));
-            pst.setTime(4, Time.valueOf(reserva.getHoraInicio()));
-            pst.setInt(5, reserva.getDuracionMin());
-            try (ResultSet rs = pst.executeQuery()) {
-                rs.next();
-                if (rs.getInt(1) > 0) return false; // Solape
-            }
-        }
+        try (CallableStatement cst = conexion.prepareCall(sql)) {
+            cst.setString(1, reserva.getIdReserva());
+            cst.setString(2, reserva.getIdSocio());
+            cst.setString(3, reserva.getIdPista());
 
-        // Insertar reserva
-        String sqlInsert = "INSERT INTO reservas(id_reserva,id_socio,id_pista,fecha,hora_inicio,duracion_min,precio) VALUES (?,?,?,?,?,?,?)";
-        try (PreparedStatement pst = conexion.prepareStatement(sqlInsert)) {
-            pst.setString(1, reserva.getIdReserva());
-            pst.setString(2, reserva.getIdSocio());
-            pst.setString(3, reserva.getIdPista());
-            pst.setDate(4, Date.valueOf(reserva.getFecha()));
-            pst.setTime(5, Time.valueOf(reserva.getHoraInicio()));
-            pst.setInt(6, reserva.getDuracionMin());
-            pst.setDouble(7, reserva.getPrecio());
-            pst.executeUpdate();
+            // Convertimos LocalDate/LocalTime de Java a SQL Date/Time
+            cst.setDate(4, Date.valueOf(reserva.getFecha()));
+            cst.setTime(5, Time.valueOf(reserva.getHoraInicio()));
+
+            cst.setInt(6, reserva.getDuracionMin());
+
+            // No pasamos el precio, el SP lo calcula e inserta.
+
+            cst.execute();
             return true;
+
+        } catch (SQLException e) {
+            // El procedimiento almacenado lanza SIGNAL SQLSTATE '45000' si hay solape o pista no disponible.
+            // Capturamos ese estado para devolver false (comportamiento esperado según tu código anterior)
+            if ("45000".equals(e.getSQLState())) {
+                System.err.println("No se pudo crear reserva (Regla de negocio): " + e.getMessage());
+                return false;
+            } else {
+                // Si es otro error (conexión, clave foránea de socio no existente, etc.), lo lanzamos.
+                throw e;
+            }
         }
     }
 
