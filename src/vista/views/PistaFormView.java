@@ -31,16 +31,19 @@ public class PistaFormView extends GridPane {
                 boolean ok = club.altaPista(new Pista(id.getText(), deporte.getText(), descripcion.getText(), disponible.isSelected()));
 
                 // Feedback para el usuario
-                if (ok)showInfo("Pista creada correctamente");
+                if (ok){
+                    showInfo("Pista creada correctamente");
+                    // Limpiar el formulario para permitir añadir otra pista sin borrar a mano
+                    id.clear();
+                    deporte.clear();
+                    descripcion.clear();
+                    disponible.setSelected(false);
+                }
 
                 else showInfo("Error al dar de alta la pista.");
 
 
-                // Limpiar el formulario para permitir añadir otra pista sin borrar a mano
-                id.clear();
-                deporte.clear();
-                descripcion.clear();
-                disponible.setSelected(false);
+
             } catch (Exception ex) {
                 showError(ex.getMessage());
             }
